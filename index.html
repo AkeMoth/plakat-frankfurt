@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLAKAT — Was läuft heute in Frankfurt?</title>
+<meta name="description" content="Jedes Plakat in Frankfurt, an einer Wand. Konzerte, Märkte, Ausstellungen und mehr — heute in deiner Stadt.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23FF3B26'/%3E%3Cpath d='M66 0 L96 0 L96 30 Z' fill='%23C8F526'/%3E%3Cpath fill-rule='evenodd' fill='%23FFFFFF' d='M30 22 H56 Q68 22 68 38 Q68 54 56 54 H43 V76 H30 Z M43 34 H54 Q57 34 57 38 Q57 42 54 42 H43 Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root{
+  /* — ink / paper — */
+  --ink-900:#0B0B0E; --ink-850:#121216; --ink-800:#16161B; --ink-700:#1E1E25; --ink-600:#2A2A33; --ink-500:#3A3A45; --ink-400:#565663;
+  --paper-100:#F6F2E9; --paper-200:#ECE6D7; --paper-300:#DED6C2; --white:#FFFFFF;
+  /* — accents — */
+  --red-600:#E22414; --red-500:#FF3B26; --red-400:#FF6450;
+  --acid-600:#A8DC00; --acid-500:#C8F526; --acid-400:#DBFB6B;
+  --gold-600:#E89400; --gold-500:#FFB300; --gold-400:#FFC740;
+  /* — type — */
+  --type-on-dark-1:#FBF9F4; --type-on-dark-2:#B8B6BE; --type-on-dark-3:#74727C;
+  --type-on-paper-1:#131217; --type-on-paper-2:#4A4754; --type-on-paper-3:#807C88;
+  --ok:#3FCF6B; --warn:#FFB300; --danger:#FF3B26; --info:#4DA3FF;
+  /* — semantic — */
+  --bg:var(--ink-900); --surface:var(--ink-800); --surface-card:var(--ink-700); --surface-raised:var(--ink-700);
+  --border:var(--ink-600); --border-strong:var(--ink-500); --border-paper:var(--paper-300);
+  --text:var(--type-on-dark-1); --text-muted:var(--type-on-dark-2); --text-faint:var(--type-on-dark-3);
+  --on-acid:#131217; --on-gold:#131217;
+  --focus-ring:var(--acid-500);
+  /* — fonts — */
+  --font-display:'Anton','Arial Narrow',sans-serif; --font-ui:'Space Grotesk',system-ui,sans-serif; --font-mono:'Space Mono',ui-monospace,monospace;
+  --ls-mono:.02em; --ls-kicker:.18em; --ls-label:.06em;
+  /* — radii / borders — */
+  --radius-0:0px; --radius-xs:2px; --radius-sm:4px; --radius-md:8px; --radius-pill:999px;
+  --bw-hair:1px; --bw:1.5px; --bw-thick:3px;
+  /* — layout — */
+  --maxw-content:1200px; --maxw-wide:1440px; --gutter:24px; --header-h:64px;
+  /* — effects — */
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 6px 18px rgba(0,0,0,.45); --shadow-hard:4px 4px 0 rgba(0,0,0,.9);
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-snap:cubic-bezier(.34,1.56,.64,1); --dur-fast:120ms; --dur:200ms;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:var(--font-display);text-transform:uppercase;line-height:.92;margin:0;font-weight:400;}
+a{color:inherit;}
+img,svg{display:block;}
+button{font:inherit;}
+::selection{background:var(--acid-500);color:var(--ink-900);}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}}
+
+/* — Marquee — */
+.marquee{height:40px;overflow:hidden;background:var(--acid-500);color:var(--ink-900);border-top:var(--bw-thick) solid var(--ink-900);border-bottom:var(--bw-thick) solid var(--ink-900);display:flex;align-items:center;}
+.marquee__track{display:inline-flex;white-space:nowrap;animation:plk-marq 24s linear infinite;}
+.marquee__group{display:inline-flex;}
+.marquee__group span{font-family:var(--font-display);text-transform:uppercase;font-size:22px;letter-spacing:.02em;padding:0 6px;}
+.marquee__group span::after{content:"★";margin:0 24px;font-size:14px;}
+@keyframes plk-marq{to{transform:translateX(-50%);}}
+
+/* — Button — */
+.plk-btn{font-family:var(--font-ui);font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-label);border:var(--bw) solid transparent;border-radius:var(--radius-0);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:transform var(--dur-fast) var(--ease-snap),box-shadow var(--dur-fast) var(--ease-out);}
+.plk-btn--lg{height:54px;padding:0 24px;font-size:15px;}
+.plk-btn--sm{height:36px;padding:0 14px;font-size:12px;}
+.plk-btn--acid{background:var(--acid-500);color:var(--on-acid);}
+.plk-btn--solid{background:var(--red-500);color:#fff;}
+.plk-btn--outline{background:transparent;color:var(--text);border-color:var(--border-strong);}
+.plk-btn:hover{box-shadow:var(--shadow-hard);transform:translate(-2px,-2px);}
+.plk-btn:active{transform:translate(1px,1px);box-shadow:none;}
+
+/* — Tag / filter chip — */
+.plk-tag{font-family:var(--font-mono);font-size:12px;letter-spacing:var(--ls-mono);text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:7px 12px;border-radius:var(--radius-pill);border:var(--bw) solid var(--border-strong);background:transparent;color:var(--text-muted);cursor:pointer;transition:color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),background var(--dur-fast) var(--ease-out);}
+.plk-tag:hover{color:var(--text);border-color:var(--acid-500);}
+.plk-tag.is-active{background:var(--acid-500);border-color:var(--acid-500);color:var(--on-acid);}
+.plk-tag__e{font-size:13px;line-height:1;}
+
+/* — Badge — */
+.plk-badge{font-family:var(--font-mono);font-weight:700;font-size:10px;letter-spacing:var(--ls-kicker);text-transform:uppercase;padding:3px 8px;border-radius:var(--radius-sm);white-space:nowrap;line-height:1.3;border:var(--bw) solid currentColor;background:transparent;color:inherit;}
+
+/* — Poster card — */
+.plk-poster{position:relative;display:flex;flex-direction:column;gap:10px;min-height:300px;padding:16px;background:var(--ink-900);color:var(--paper-100);text-align:left;box-shadow:var(--shadow-md);transform:rotate(var(--tilt,0deg));transition:transform var(--dur) var(--ease-snap),box-shadow var(--dur) var(--ease-out);}
+.plk-poster:hover{transform:translate(-3px,-3px) rotate(0deg);box-shadow:var(--shadow-hard);z-index:2;}
+.plk-poster--red{background:var(--red-500);color:#fff;}
+.plk-poster--acid{background:var(--acid-500);color:var(--ink-900);}
+.plk-poster--gold{background:var(--gold-500);color:var(--ink-900);}
+.plk-poster--ink{background:var(--ink-800);color:var(--paper-100);}
+.plk-poster__top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.plk-poster__emoji{font-size:20px;line-height:1;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);background:rgba(127,127,127,.18);background:color-mix(in srgb,currentColor 14%,transparent);}
+.plk-poster__body{display:flex;flex-direction:column;gap:8px;flex:1;}
+.plk-poster__kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--ls-kicker);text-transform:uppercase;opacity:.92;}
+.plk-poster__title{font-family:var(--font-display);text-transform:uppercase;line-height:.9;letter-spacing:-.01em;font-size:clamp(22px,2.4vw,32px);overflow-wrap:break-word;hyphens:auto;}
+.plk-poster__venue{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:var(--ls-mono);opacity:.85;}
+.plk-poster__venue span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.plk-poster__pin{flex:none;}
+.plk-poster__desc{font-family:var(--font-ui);font-size:13px;line-height:1.45;opacity:.82;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.plk-poster__foot{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:var(--ls-mono);}
+.plk-poster__price.is-free{font-weight:700;}
+.plk-poster__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;}
+.plk-cardbtn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:8px 11px;font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-mono);color:inherit;text-decoration:none;background:transparent;border:var(--bw) solid currentColor;border-radius:var(--radius-sm);cursor:pointer;transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);}
+.plk-cardbtn:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 currentColor;}
+.plk-cardbtn:active{transform:translate(0,0);box-shadow:none;}
+.plk-cardbtn__i{font-size:12px;line-height:1;}
+
+/* — Poster card: gescanntes Foto — */
+.plk-poster--photo{background:var(--ink-800);color:var(--paper-100);}
+.plk-poster__stage{position:relative;margin:-16px -16px 2px;overflow:hidden;background:var(--ink-700);}
+.plk-poster__img{width:100%;height:190px;object-fit:cover;background:var(--ink-700);}
+.plk-poster--photo .plk-poster__top{position:absolute;top:10px;left:10px;right:10px;margin:0;}
+.plk-poster--photo .plk-poster__emoji{background:rgba(11,11,14,.62);color:#fff;backdrop-filter:blur(3px);}
+.plk-poster--photo .plk-badge{background:rgba(11,11,14,.62);color:#fff;border-color:rgba(255,255,255,.45);backdrop-filter:blur(3px);}
+
+/* — Header — */
+.hdr{position:sticky;top:0;z-index:30;height:var(--header-h);display:flex;align-items:center;gap:14px;padding:0 var(--gutter);background:rgba(11,11,14,.92);backdrop-filter:blur(10px);border-bottom:var(--bw) solid var(--ink-700);}
+.hdr__brand{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.hdr__mark{width:28px;height:28px;}
+.hdr__word{font-family:var(--font-display);text-transform:uppercase;font-size:23px;letter-spacing:.01em;color:var(--paper-100);}
+.hdr__sq{width:11px;height:11px;background:var(--acid-500);}
+.hdr__spacer{flex:1;}
+.hdr__nav{display:none;gap:6px;}
+@media(min-width:760px){.hdr__nav{display:flex;}}
+
+/* — Hero — */
+.hero{padding:34px var(--gutter) 24px;display:grid;gap:18px;max-width:var(--maxw-wide);margin:0 auto;}
+.hero__kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:var(--ls-kicker);text-transform:uppercase;color:var(--red-500);}
+.hero__h1{font-family:var(--font-display);text-transform:uppercase;line-height:.86;letter-spacing:-.01em;font-size:clamp(44px,9vw,100px);color:var(--paper-100);margin:8px 0 0;}
+.hero__pop{color:var(--acid-500);}
+.hero__right{display:flex;flex-direction:column;gap:16px;}
+.hero__sub{font-family:var(--font-ui);font-size:16px;line-height:1.55;color:var(--text-muted);max-width:380px;margin:0;}
+.hero__cta{display:flex;flex-wrap:wrap;gap:12px;}
+@media(min-width:860px){.hero{grid-template-columns:1.5fr 1fr;align-items:end;padding:48px var(--gutter) 30px;}}
+
+/* — Controls (search + filters), sticky — */
+.controls{position:sticky;top:var(--header-h);z-index:20;background:rgba(11,11,14,.92);backdrop-filter:blur(10px);border-top:var(--bw) solid var(--ink-700);border-bottom:var(--bw) solid var(--ink-700);}
+.controls__inner{max-width:var(--maxw-wide);margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:12px var(--gutter);}
+.search{position:relative;}
+.search__i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:14px;pointer-events:none;}
+.plk-input{width:100%;font-family:var(--font-ui);font-size:15px;color:var(--text);background:var(--ink-850);border:var(--bw) solid var(--border-strong);border-radius:var(--radius-sm);padding:12px 13px 12px 36px;}
+.plk-input::placeholder{color:var(--text-faint);}
+.plk-input:focus{outline:none;border-color:var(--acid-500);box-shadow:0 0 0 3px rgba(200,245,38,.18);}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.filters::-webkit-scrollbar{display:none;}
+@media(min-width:860px){.filters{flex-wrap:wrap;overflow:visible;}}
+
+/* — Wall — */
+.wall-wrap{max-width:var(--maxw-wide);margin:0 auto;padding:20px var(--gutter) 8px;}
+.wall-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;}
+.wall-head__t{font-family:var(--font-mono);font-size:12px;letter-spacing:var(--ls-kicker);text-transform:uppercase;color:var(--text-muted);}
+.wall-head__c{font-family:var(--font-mono);font-size:12px;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--text-faint);}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:20px;align-items:start;}
+.state{padding:60px 0;text-align:center;}
+.state__big{font-family:var(--font-display);text-transform:uppercase;font-size:clamp(24px,4vw,40px);color:var(--paper-100);}
+.state__sub{font-family:var(--font-ui);font-size:15px;color:var(--text-muted);margin-top:8px;}
+.state[hidden]{display:none;}
+
+/* — Footer — */
+.foot{max-width:var(--maxw-wide);margin:40px auto 0;padding:48px var(--gutter);border-top:var(--bw) solid var(--ink-700);}
+.foot__big{font-family:var(--font-display);text-transform:uppercase;line-height:.92;font-size:clamp(30px,6vw,60px);color:var(--paper-100);}
+.foot__pop{color:var(--acid-500);}
+.foot__sub{font-family:var(--font-ui);color:var(--text-muted);margin-top:10px;}
+.foot__meta{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--ls-mono);text-transform:uppercase;color:var(--text-faint);margin-top:24px;}
+
+</style>
+</head>
+<body>
+<header class="hdr">
+  <a class="hdr__brand" href="#" aria-label="PLAKAT — Startseite">
+    <svg class="hdr__mark" viewBox="0 0 96 96" role="img" aria-hidden="true">
+      <rect width="96" height="96" fill="#FF3B26"></rect>
+      <path d="M66 0 L96 0 L96 30 Z" fill="#C8F526"></path>
+      <path fill-rule="evenodd" fill="#FFFFFF" d="M30 22 H56 Q68 22 68 38 Q68 54 56 54 H43 V76 H30 Z M43 34 H54 Q57 34 57 38 Q57 42 54 42 H43 Z"></path>
+    </svg>
+    <span class="hdr__word">Plakat</span>
+    <span class="hdr__sq" aria-hidden="true"></span>
+  </a>
+  <nav class="hdr__nav" id="navFilters" aria-label="Schnellfilter"></nav>
+  <span class="hdr__spacer"></span>
+  <a class="plk-btn plk-btn--solid plk-btn--sm" id="scanBtn" target="_blank" rel="noopener noreferrer">Plakat scannen</a>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <div class="marquee__group"><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span></div>
+    <div class="marquee__group"><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span><span>Heute in Frankfurt</span></div>
+  </div>
+</div>
+
+<section class="hero">
+  <div>
+    <div class="hero__kicker">▌Die Plakatwand der Stadt</div>
+    <h1 class="hero__h1">Was läuft <span class="hero__pop">heute?</span></h1>
+  </div>
+  <div class="hero__right">
+    <p class="hero__sub">Jedes Plakat in Frankfurt, an einer Wand. Du fotografierst es auf der Straße — wir tippen Datum, Ort und Preis ein.</p>
+    <div class="hero__cta">
+      <button class="plk-btn plk-btn--acid plk-btn--lg" id="toWall" type="button">Zur Plakatwand ↓</button>
+      <a class="plk-btn plk-btn--outline plk-btn--lg" id="heroScan" target="_blank" rel="noopener noreferrer">Plakat hochladen ↗</a>
+    </div>
+  </div>
+</section>
+
+<div class="controls" id="controls">
+  <div class="controls__inner">
+    <div class="search">
+      <span class="search__i" aria-hidden="true">⌕</span>
+      <input class="plk-input" id="q" type="search" autocomplete="off" placeholder="Suche nach Titel oder Ort …" aria-label="Veranstaltungen durchsuchen">
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Nach Art filtern"></div>
+  </div>
+</div>
+
+<main class="wall-wrap">
+  <div class="wall-head">
+    <span class="wall-head__t">▌Die Wand</span>
+    <span class="wall-head__c" id="count"></span>
+  </div>
+  <div class="wall" id="wall"></div>
+  <div class="state" id="state" hidden></div>
+</main>
+
+<footer class="foot">
+  <div class="foot__big">Die Stadt hängt voller Plakate.</div>
+  <div class="foot__sub">Fotografier eins. <span class="foot__pop">Wir machen den Rest.</span></div>
+  <div class="foot__meta">PLAKAT · FRANKFURT AM MAIN · 50.1109°N · 8.6821°E · © 2026</div>
+</footer>
+
+<script>
+"use strict";
+
+/* ────────────────────────────────────────────────────────────
+   1) KONFIGURATION
+   Sobald die Endpoint-URL bereitsteht, hier einsetzen.
+   Leer lassen = Mock-Daten (für die lokale Demo).
+─────────────────────────────────────────────────────────────*/
+const ENDPOINT = ""; // z. B. "https://.../events" — leer = Mock
+
+/* Öffentliches n8n-Formular zum Hochladen eines Plakat-Fotos */
+const FORM_URL = "https://akemoth.app.n8n.cloud/form/7f34b3b5-d032-40d2-a711-5cfe278615c5";
+
+/* Typ-Taxonomie: Label (DE), Emoji, Plakat-Akzentfarbe */
+const TYPES = {
+  concert:  { label:"Konzert",     emoji:"🎵", accent:"red"  },
+  expo:     { label:"Ausstellung", emoji:"🖼️", accent:"ink"  },
+  theatre:  { label:"Theater",     emoji:"🎭", accent:"gold" },
+  marche:   { label:"Markt",       emoji:"🛒", accent:"acid" },
+  sport:    { label:"Sport",       emoji:"⚽", accent:"red"  },
+  festival: { label:"Festival",    emoji:"🎉", accent:"gold" },
+  autre:    { label:"Sonstiges",   emoji:"📌", accent:"ink"  },
+};
+
+/* ── Hilfsfunktionen ────────────────────────────────────────*/
+const WD = ["SO","MO","DI","MI","DO","FR","SA"];
+const pad = n => String(n).padStart(2,"0");
+
+function parseDMY(s){
+  if(typeof s!=="string") return null;
+  const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m) return null;
+  const dt = new Date(+m[3], +m[2]-1, +m[1]);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function addDays(d,n){ const c=new Date(d); c.setDate(c.getDate()+n); return c; }
+function fmtFull(d){ return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`; }
+function fmtShort(d){ return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.`; }
+function ymd(d){ return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`; }
+const NOW = startOfDay(new Date());
+
+/* Datumszeile in DE: Bereich → "11.06. – 20.09.2026", ein Tag → "MI · 11.06.2026" */
+function dateLine(ev){
+  const d1 = parseDMY(ev.date_debut);
+  if(!d1) return "";
+  if(ev.date_fin){
+    const d2 = parseDMY(ev.date_fin);
+    if(d2 && d2.getTime() !== d1.getTime()){
+      const left = d1.getFullYear()===d2.getFullYear() ? fmtShort(d1) : fmtFull(d1);
+      return `${left} – ${fmtFull(d2)}`;
+    }
+  }
+  return `${WD[d1.getDay()]} · ${fmtFull(d1)}`;
+}
+
+/* "heute" = läuft an einem Tag, der das aktuelle Datum einschließt */
+function isToday(ev){
+  const d1 = parseDMY(ev.date_debut); if(!d1) return false;
+  const d2 = ev.date_fin ? (parseDMY(ev.date_fin) || d1) : d1;
+  return startOfDay(d1) <= NOW && NOW <= startOfDay(d2);
+}
+function isFree(p){ return typeof p==="string" && /\b(frei|kostenlos|gratis|free)\b/i.test(p); }
+
+/* Nur http/https zulassen — schützt vor javascript:/data: in externen Daten */
+function safeUrl(u){
+  if(typeof u!=="string" || !u) return null;
+  try{ const url=new URL(u, location.href); return /^https?:$/.test(url.protocol) ? url.href : null; }
+  catch{ return null; }
+}
+/* Bildquelle: http/https ODER inline data:image/*;base64 (Backend kann beides liefern) */
+function safeImg(u){
+  if(typeof u!=="string" || !u) return null;
+  if(/^data:image\/(png|jpe?g|gif|webp|avif);base64,/i.test(u)) return u;
+  return safeUrl(u);
+}
+/* DOM-Helfer: Text immer per textContent (kein innerHTML) → kein XSS aus den Daten */
+function el(tag, cls, txt){ const n=document.createElement(tag); if(cls) n.className=cls; if(txt!=null) n.textContent=txt; return n; }
+
+/* Google-Maps-/Kalender-Link aufbauen, falls das Backend ihn nicht mitliefert */
+function buildMaps(ev){
+  if(ev.lat && ev.lon) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lat)},${encodeURIComponent(ev.lon)}`;
+  const place = ev.adresse_verifiee || ev.lieu;
+  return place ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}` : "";
+}
+function buildAgenda(ev){
+  const d1 = parseDMY(ev.date_debut); if(!d1) return "";
+  const d2 = ev.date_fin ? (parseDMY(ev.date_fin) || d1) : d1;
+  const params = new URLSearchParams({
+    action:"TEMPLATE",
+    text: ev.titre || "Veranstaltung",
+    dates: `${ymd(d1)}/${ymd(addDays(d2,1))}`,
+    location: ev.adresse_verifiee || ev.lieu || "",
+    details: (TYPES[ev.type] && TYPES[ev.type].label) || ""
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+/* ── MOCK (echtes Schema; deckt Rand­fälle ab) ──────────────*/
+const MOCK = [
+  { titre:"THE WORLD THROUGH AI", emoji:"🖼️", type:"expo",
+    image_url:"https://picsum.photos/seed/schirn-ai/640/800",
+    date_debut:"11/06/2026", date_fin:"20/09/2026", heure:null,
+    lieu:"SCHIRN KUNSTHALLE FRANKFURT",
+    adresse_verifiee:"Schirn Kunsthalle, 20, Saalgasse, Altstadt, Innenstadt 1, Frankfurt am Main, Hessen, 60311, Deutschland",
+    lat:"50.1102560", lon:"8.6836356",
+    maps_url:"https://www.google.com/maps/search/?api=1&query=50.1102560,8.6836356",
+    agenda_url:"https://calendar.google.com/calendar/render?action=TEMPLATE&text=THE%20WORLD%20THROUGH%20AI&dates=20260611/20260920&location=SCHIRN%20KUNSTHALLE%20FRANKFURT&details=Expo",
+    prix:null, description:null, geo_ok:"oui" },
+
+  { titre:"Post-Punk im Batschkapp", emoji:"🎵", type:"concert",
+    image_url:"https://picsum.photos/seed/batschkapp/640/800",
+    date_debut:"25/06/2026", date_fin:null, heure:"20:00",
+    lieu:"BATSCHKAPP", adresse_verifiee:"Gwinnerstraße 5, 60388 Frankfurt am Main",
+    lat:"50.1490", lon:"8.7240", maps_url:"", agenda_url:"",
+    prix:"€22", description:"Vier Bands aus dem Rhein-Main-Untergrund. Türen 19:00, laut ab 20:00.", geo_ok:"oui" },
+
+  { titre:"Techno im Bunker", emoji:"🎵", type:"concert",
+    image_url:"https://picsum.photos/seed/bunker-techno/640/800",
+    date_debut:"27/06/2026", date_fin:null, heure:"23:00",
+    lieu:"OSTEND", adresse_verifiee:"Ostend, Frankfurt am Main",
+    lat:"50.1170", lon:"8.7180", maps_url:"", agenda_url:"",
+    prix:"€12", description:"Vier Floors, ein alter Hochbunker, Sound bis Sonntag. Strenge Türpolitik.", geo_ok:"oui" },
+
+  { titre:"Flohmarkt am Mainufer", emoji:"🛒", type:"marche",
+    image_url:"https://picsum.photos/seed/flohmarkt-main/640/800",
+    date_debut:"29/06/2026", date_fin:null, heure:"09:00",
+    lieu:"SCHAUMAINKAI", adresse_verifiee:"Schaumainkai, 60596 Frankfurt am Main",
+    lat:"50.1031", lon:"8.6760", maps_url:"", agenda_url:"",
+    prix:"Frei", description:"Der größte Trödelmarkt der Stadt entlang des Museumsufers. Früh kommen lohnt sich.", geo_ok:"oui" },
+
+  { titre:"Tanz im Mousonturm", emoji:"🎭", type:"theatre",
+    image_url:"https://picsum.photos/seed/mousonturm-tanz/640/800",
+    date_debut:"24/06/2026", date_fin:null, heure:"19:30",
+    lieu:"KÜNSTLERHAUS MOUSONTURM", adresse_verifiee:"Waldschmidtstraße 4, 60316 Frankfurt am Main",
+    lat:"50.1230", lon:"8.7010", maps_url:"", agenda_url:"",
+    prix:"€14", description:"Zeitgenössischer Tanz aus Brüssel. 70 Minuten, danach Publikumsgespräch.", geo_ok:"oui" },
+
+  { titre:"Apfelwein Festival", emoji:"🎉", type:"festival",
+    image_url:"https://picsum.photos/seed/apfelwein-fest/640/800",
+    date_debut:"27/06/2026", date_fin:"29/06/2026", heure:null,
+    lieu:"ROSSMARKT", adresse_verifiee:"Roßmarkt, 60311 Frankfurt am Main",
+    lat:"50.1118", lon:"8.6790", maps_url:"", agenda_url:"",
+    prix:"Frei", description:"Ebbelwei, Handkäs und Blasmusik mitten in der Stadt. Drei Tage Bembel-Kultur.", geo_ok:"oui" },
+
+  { titre:"Eintracht Open Training", emoji:"⚽", type:"sport",
+    date_debut:"21/06/2026", date_fin:null, heure:"15:00",
+    lieu:"DEUTSCHE BANK PARK", adresse_verifiee:"Mörfelder Landstraße 362, 60528 Frankfurt am Main",
+    lat:"50.0686", lon:"8.6456", maps_url:"", agenda_url:"",
+    prix:"Frei", description:null, geo_ok:"oui" },
+
+  { titre:"Lesung im Hinterhof", emoji:"📌", type:"autre",
+    date_debut:"23/06/2026", date_fin:null, heure:"19:00",
+    lieu:"NORDEND", adresse_verifiee:"", lat:"", lon:"", maps_url:"", agenda_url:"",
+    prix:null, description:"Drei Debüts, ein Hinterhof, Wein gegen Spende. Sitzkissen mitbringen.", geo_ok:"non" },
+];
+
+/* ────────────────────────────────────────────────────────────
+   2) ZUSTAND + RENDERING
+─────────────────────────────────────────────────────────────*/
+const TILTS = [-1.4, 1, -0.7, 1.6, -1.1, 0.6];
+let ALL = [];
+let q = "";
+let activeFilter = "Alle";
+
+const $ = id => document.getElementById(id);
+const wallEl = $("wall"), stateEl = $("state"), countEl = $("count"),
+      filtersEl = $("filters"), navEl = $("navFilters"), qEl = $("q");
+
+/* Backend kann Felder leer lassen → Links bei Bedarf selbst erzeugen */
+function normalize(ev){
+  const e = Object.assign({}, ev);
+  if(!safeUrl(e.maps_url))   e.maps_url   = buildMaps(e);
+  if(!safeUrl(e.agenda_url)) e.agenda_url = buildAgenda(e);
+  return e;
+}
+
+function matchesFilter(ev){
+  if(activeFilter==="Alle")  return true;
+  if(activeFilter==="Heute") return isToday(ev);
+  if(activeFilter==="Frei")  return isFree(ev.prix);
+  return ev.type === activeFilter;        // Typ-Schlüssel
+}
+function matchesQuery(ev){
+  if(!q) return true;
+  return ((ev.titre||"") + " " + (ev.lieu||"")).toLowerCase().includes(q);
+}
+function sortByDate(list){
+  return list.sort((a,b)=>{
+    const da=parseDMY(a.date_debut), db=parseDMY(b.date_debut);
+    if(!da && !db) return 0; if(!da) return 1; if(!db) return -1;
+    return da - db;                        // aufsteigend: das Nächste zuerst
+  });
+}
+
+/* Eine Plakat-Karte bauen (nur vorhandene Felder → keine leeren Zeilen) */
+function card(ev, i){
+  const t = TYPES[ev.type] || { label:"Veranstaltung", emoji:"📌", accent:"ink" };
+  const art = el("article", "plk-poster plk-poster--" + t.accent);
+  art.style.setProperty("--tilt", TILTS[i % TILTS.length] + "deg");
+
+  const top = el("div","plk-poster__top");
+  top.appendChild(el("span","plk-poster__emoji", ev.emoji || t.emoji));
+  top.appendChild(el("span","plk-badge", t.label));
+
+  /* Gescanntes Plakat-Foto als Bühne; Emoji + Badge schweben darüber.
+     Lädt das Bild nicht, fällt die Karte sauber auf das Farbplakat zurück. */
+  const img = safeImg(ev.image_url);
+  if(img){
+    art.classList.add("plk-poster--photo");
+    const stage = el("div","plk-poster__stage");
+    const im = el("img","plk-poster__img");
+    im.src = img; im.alt = "Plakat: " + (ev.titre || "Veranstaltung");
+    im.loading = "lazy"; im.decoding = "async";
+    im.addEventListener("error", ()=>{
+      art.classList.remove("plk-poster--photo");
+      art.insertBefore(top, art.firstChild);
+      stage.remove();
+    });
+    stage.appendChild(im);
+    stage.appendChild(top);
+    art.appendChild(stage);
+  } else {
+    art.appendChild(top);
+  }
+
+  const body = el("div","plk-poster__body");
+  const dl = dateLine(ev) + (ev.heure ? (" · " + ev.heure) : "");
+  if(dl.trim()) body.appendChild(el("div","plk-poster__kicker", dl));
+  body.appendChild(el("h3","plk-poster__title", ev.titre || "Ohne Titel"));
+  if(ev.lieu){
+    const v = el("div","plk-poster__venue");
+    v.appendChild(el("span","plk-poster__pin","📍"));
+    v.appendChild(el("span", null, ev.lieu));
+    body.appendChild(v);
+  }
+  art.appendChild(body);
+
+  if(ev.description) art.appendChild(el("p","plk-poster__desc", ev.description));
+
+  if(isFree(ev.prix) || ev.prix){
+    const foot = el("div","plk-poster__foot");
+    foot.appendChild(el("span", "plk-poster__price" + (isFree(ev.prix) ? " is-free" : ""),
+                       isFree(ev.prix) ? "Eintritt frei" : ev.prix));
+    art.appendChild(foot);
+  }
+
+  const acts = el("div","plk-poster__actions");
+  const maps = safeUrl(ev.maps_url);
+  if(ev.geo_ok==="oui" && maps){
+    const a = el("a","plk-cardbtn"); a.href=maps; a.target="_blank"; a.rel="noopener noreferrer";
+    a.appendChild(el("span","plk-cardbtn__i","📍")); a.appendChild(el("span",null,"Route"));
+    acts.appendChild(a);
+  }
+  const ag = safeUrl(ev.agenda_url);
+  if(ag){
+    const a = el("a","plk-cardbtn"); a.href=ag; a.target="_blank"; a.rel="noopener noreferrer";
+    a.appendChild(el("span","plk-cardbtn__i","➕")); a.appendChild(el("span",null,"Kalender"));
+    acts.appendChild(a);
+  }
+  if(acts.childNodes.length) art.appendChild(acts);
+  return art;
+}
+
+function setState(big, sub){
+  stateEl.textContent = "";
+  stateEl.appendChild(el("div","state__big", big));
+  if(sub) stateEl.appendChild(el("div","state__sub", sub));
+  stateEl.hidden = false;
+}
+
+function render(){
+  if(!ALL.length){ wallEl.innerHTML=""; countEl.textContent=""; setState("Lade …","Veranstaltungen werden geladen."); return; }
+  const list = sortByDate(ALL.filter(matchesFilter).filter(matchesQuery));
+  wallEl.innerHTML = "";
+  if(!list.length){
+    countEl.textContent = "0 Treffer";
+    setState("Nichts gefunden", "Andere Suche oder anderen Filter probieren.");
+    return;
+  }
+  stateEl.hidden = true;
+  countEl.textContent = list.length + (list.length===1 ? " Veranstaltung" : " Veranstaltungen");
+  const frag = document.createDocumentFragment();
+  list.forEach((ev,i)=> frag.appendChild(card(ev,i)));
+  wallEl.appendChild(frag);
+}
+
+/* Filter-Chips dynamisch: Basis + nur tatsächlich vorhandene Typen */
+function buildFilters(){
+  const present = new Set(ALL.map(e=>e.type));
+  const items = [
+    { v:"Alle",  label:"Alle",         emoji:"" },
+    { v:"Heute", label:"Heute",        emoji:"📅" },
+    { v:"Frei",  label:"Eintritt frei",emoji:"🎟️" },
+  ];
+  Object.keys(TYPES).forEach(k=>{
+    if(present.has(k)) items.push({ v:k, label:TYPES[k].label, emoji:TYPES[k].emoji });
+  });
+  const make = (host) => {
+    host.textContent = "";
+    items.forEach(it=>{
+      const b = el("button","plk-tag" + (it.v===activeFilter ? " is-active":""));
+      b.type="button"; b.dataset.v = it.v; b.setAttribute("aria-pressed", String(it.v===activeFilter));
+      if(it.emoji) b.appendChild(el("span","plk-tag__e", it.emoji));
+      b.appendChild(el("span",null,it.label));
+      host.appendChild(b);
+    });
+  };
+  make(filtersEl);
+  // Header-Schnellfilter: nur Alle / Heute / Eintritt frei
+  navEl.textContent = "";
+  items.slice(0,3).forEach(it=>{
+    const b = el("button","plk-tag" + (it.v===activeFilter ? " is-active":""));
+    b.type="button"; b.dataset.v = it.v; b.appendChild(el("span",null,it.label));
+    navEl.appendChild(b);
+  });
+}
+function syncActive(){
+  document.querySelectorAll(".plk-tag[data-v]").forEach(b=>{
+    const on = b.dataset.v===activeFilter;
+    b.classList.toggle("is-active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+}
+
+/* ────────────────────────────────────────────────────────────
+   3) DATEN LADEN  (Endpoint → sonst Mock; Fehler → Mock)
+─────────────────────────────────────────────────────────────*/
+async function load(){
+  render(); // Ladezustand
+  let data = null;
+  if(ENDPOINT){
+    try{
+      const r = await fetch(ENDPOINT, { headers:{ Accept:"application/json" } });
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      data = await r.json();
+    }catch(err){
+      console.warn("[PLAKAT] Endpoint nicht erreichbar — nutze Mock-Daten.", err);
+    }
+  }
+  let arr = Array.isArray(data) ? data
+          : (data && (data.events || data.data || data.items)) || null;
+  if(!Array.isArray(arr)) arr = MOCK;   // Fallback: Demo bricht nie ab
+  ALL = arr.map(normalize);
+  buildFilters();
+  render();
+}
+
+/* ── Verdrahtung ───────────────────────────────────────────*/
+qEl.addEventListener("input", e=>{ q = e.target.value.trim().toLowerCase(); render(); });
+
+document.addEventListener("click", e=>{
+  const chip = e.target.closest(".plk-tag[data-v]");
+  if(chip){ activeFilter = chip.dataset.v; syncActive(); render(); }
+});
+
+$("toWall").addEventListener("click", ()=> $("controls").scrollIntoView({ behavior:"smooth", block:"start" }));
+
+/* Beide CTAs öffnen das n8n-Upload-Formular (eine Quelle für die URL) */
+$("scanBtn").href = FORM_URL;
+$("heroScan").href = FORM_URL;
+
+load();
+</script>
+</body>
+</html>
