@@ -83,6 +83,9 @@ button{font:inherit;}
 /* — Poster card — */
 .plk-poster{position:relative;display:flex;flex-direction:column;gap:10px;min-height:300px;padding:16px;background:var(--ink-900);color:var(--paper-100);text-align:left;box-shadow:var(--shadow-md);transform:rotate(var(--tilt,0deg));transition:transform var(--dur) var(--ease-snap),box-shadow var(--dur) var(--ease-out);}
 .plk-poster:hover{transform:translate(-3px,-3px) rotate(0deg);box-shadow:var(--shadow-hard);z-index:2;}
+/* Frisch aus dem Live-Feed eingetroffene Karte kurz „aufpoppen" — Tilt bleibt erhalten */
+@keyframes plkPop{0%{opacity:0;transform:scale(.9) rotate(var(--tilt,0deg));}60%{opacity:1;transform:scale(1.04) rotate(var(--tilt,0deg));}100%{opacity:1;transform:scale(1) rotate(var(--tilt,0deg));}}
+.plk-poster.is-new{animation:plkPop .55s var(--ease-snap) both;box-shadow:var(--shadow-hard);}
 .plk-poster--red{background:var(--red-500);color:#fff;}
 .plk-poster--acid{background:var(--acid-500);color:var(--ink-900);}
 .plk-poster--gold{background:var(--gold-500);color:var(--ink-900);}
@@ -391,6 +394,16 @@ let ALL = [];
 let q = "";
 let activeFilter = "Alle";
 
+/* Live-Abgleich: stabiler Schlüssel je Veranstaltung + Feed-Signatur.
+   Signatur deckt neue UND geänderte Zeilen ab (z. B. nachgereichtes Foto). */
+const keyOf   = e => e.dedup_key || ((e.titre||"") + "|" + (e.date_debut||""));
+const rowSig  = e => [keyOf(e), e.statut, e.image_url?1:0, e.titre, e.date_debut, e.date_fin, e.heure, e.lieu, e.prix].join("¦");
+const feedSig = list => list.map(rowSig).sort().join("~");
+let knownKeys = new Set();   // bereits gesehene Schlüssel (kein Pop für Bestand)
+let lastSig   = null;        // letzte Feed-Signatur → nur bei echter Änderung rendern
+const NEW_KEYS = new Set();  // beim letzten Poll neu hinzugekommen → Pop-Animation
+const POLL_MS = 12000;       // Abfrageintervall (Hintergrund-Tab pausiert)
+
 const $ = id => document.getElementById(id);
 const wallEl = $("wall"), stateEl = $("state"), countEl = $("count"),
       filtersEl = $("filters"), navEl = $("navFilters"), qEl = $("q");
@@ -426,6 +439,7 @@ function sortByDate(list){
 function card(ev, i){
   const t = TYPES[ev.type] || { label:"Veranstaltung", emoji:"📌", accent:"ink" };
   const art = el("article", "plk-poster plk-poster--" + t.accent);
+  if(NEW_KEYS.has(keyOf(ev))) art.classList.add("is-new");   // frisch im Feed → Pop
   art.style.setProperty("--tilt", TILTS[i % TILTS.length] + "deg");
 
   const top = el("div","plk-poster__top");
@@ -512,6 +526,11 @@ function render(){
   const frag = document.createDocumentFragment();
   list.forEach((ev,i)=> frag.appendChild(card(ev,i)));
   wallEl.appendChild(frag);
+  if(NEW_KEYS.size){
+    // Klasse nach dem Pop entfernen → :hover-Transform wieder frei (fill:both sonst blockiert)
+    setTimeout(()=>wallEl.querySelectorAll(".plk-poster.is-new").forEach(n=>n.classList.remove("is-new")), 650);
+    NEW_KEYS.clear();   // nur einmal animieren — Filter/Suche danach nicht erneut
+  }
 }
 
 /* Filter-Chips dynamisch: Basis + nur tatsächlich vorhandene Typen */
@@ -553,27 +572,52 @@ function syncActive(){
 }
 
 /* ────────────────────────────────────────────────────────────
-   3) DATEN LADEN  (Endpoint → sonst Mock; Fehler → Mock)
+   3) DATEN LADEN  (Endpoint → sonst Mock) + Live-Abgleich
 ─────────────────────────────────────────────────────────────*/
+/* Feed einmal abfragen → Array (oder null bei Timeout/Fehler/unerreichbar) */
+async function fetchFeed(){
+  if(!ENDPOINT) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), 8000);   // nie ewig hängen
+  try{
+    const r = await fetch(ENDPOINT, { headers:{ Accept:"application/json" }, signal:ctrl.signal });
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    const arr = Array.isArray(data) ? data
+              : (data && (data.events || data.data || data.items)) || null;
+    return Array.isArray(arr) ? arr : null;
+  }catch(err){
+    console.warn("[PLAKAT] Feed nicht erreichbar.", err);
+    return null;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+/* Erststart: Feed laden (sonst Mock), Bestand als „bekannt" merken,
+   danach im Hintergrund weiter abgleichen */
 async function load(){
   render(); // Ladezustand
-  let data = null;
-  if(ENDPOINT){
-    const ctrl = new AbortController();
-    const timer = setTimeout(()=>ctrl.abort(), 8000); // nie ewig "Lade …" hängen
-    try{
-      const r = await fetch(ENDPOINT, { headers:{ Accept:"application/json" }, signal:ctrl.signal });
-      if(!r.ok) throw new Error("HTTP " + r.status);
-      data = await r.json();
-    }catch(err){
-      console.warn("[PLAKAT] Endpoint nicht erreichbar — nutze Mock-Daten.", err);
-    }finally{
-      clearTimeout(timer);
-    }
-  }
-  let arr = Array.isArray(data) ? data
-          : (data && (data.events || data.data || data.items)) || null;
-  if(!Array.isArray(arr) || !arr.length) arr = MOCK;   // Fallback: leeres/erreichbares Backend → Demo bricht nie ab
+  const arr = await fetchFeed();
+  const list = (arr && arr.length) ? arr : MOCK;   // Fallback: Demo bricht nie ab
+  knownKeys = new Set(list.map(keyOf));
+  lastSig   = feedSig(list);
+  ALL = list.map(normalize);
+  buildFilters();
+  render();
+  if(ENDPOINT) setInterval(poll, POLL_MS);         // neue Plakate ohne Reload einblenden
+}
+
+/* Stiller Abgleich: nur bei echter Änderung neu rendern;
+   wirklich neue Zeilen poppen kurz auf (NEW_KEYS → .is-new) */
+async function poll(){
+  if(document.hidden) return;            // Hintergrund-Tab → keine Anfrage
+  const arr = await fetchFeed();
+  if(!arr || !arr.length) return;        // Backend kurz weg → bestehende Wand behalten
+  const sig = feedSig(arr);
+  if(sig === lastSig) return;            // nichts geändert → nicht neu rendern
+  arr.forEach(e=>{ const k = keyOf(e); if(!knownKeys.has(k)){ NEW_KEYS.add(k); knownKeys.add(k); } });
+  lastSig = sig;
   ALL = arr.map(normalize);
   buildFilters();
   render();
@@ -592,6 +636,9 @@ $("toWall").addEventListener("click", ()=> $("controls").scrollIntoView({ behavi
 /* Beide CTAs öffnen das n8n-Upload-Formular (eine Quelle für die URL) */
 $("scanBtn").href = FORM_URL;
 $("heroScan").href = FORM_URL;
+
+/* Zurück im Tab → sofort abgleichen (nicht bis zum nächsten Intervall warten) */
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && ENDPOINT) poll(); });
 
 load();
 </script>
